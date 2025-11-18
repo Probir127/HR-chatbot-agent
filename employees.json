@@ -1,0 +1,117 @@
+{
+  "EmployeeDetails": {
+    "OperationTeam": [
+      {
+        "EmployeeName": "Punom Chowhan",
+        "Email": "punom.acmeai@gmail.com",
+        "Table": "1-A",
+        "BloodGroup": "B+",
+        "Position": "Team Lead"
+      },
+      {
+        "EmployeeName": "Saiful Islam Likhon",
+        "Email": "saifulislamlikhon.acmeai@gmail.com",
+        "Table": "1-A",
+        "BloodGroup": "O+",
+        "Position": "Assistant Team Lead"
+      },
+      {
+        "EmployeeName": "Md. Nurshad Hossain Shad",
+        "Email": "nurshadhossainacmeai@gmail.com",
+        "Table": "1-A",
+        "BloodGroup": "O+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "MD. Naymul Islam",
+        "Email": "naymul.acmeai@gmail.com",
+        "Table": "1-A",
+        "BloodGroup": "A+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Sadia Afrin Juthi",
+        "Email": "juthi.acmeai@gmail.com",
+        "Table": "1-B",
+        "BloodGroup": "O+",
+        "Position": "Team Lead"
+      },
+      {
+        "EmployeeName": "Nazmus Sakib",
+        "Email": "nazmus.acmeai@gmail.com",
+        "Table": "1-B",
+        "BloodGroup": "O+",
+        "Position": "Assistant Team Lead"
+      },
+      {
+        "EmployeeName": "Minhaj Uddin",
+        "Email": "minhaj.acmeai@gmail.com",
+        "Table": "1-B",
+        "BloodGroup": "O+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Md Shakil Ahamed",
+        "Email": "shakil.acmeanno@gmail.com",
+        "Table": "1-C",
+        "BloodGroup": "O+",
+        "Position": "Team Lead"
+      },
+      {
+        "EmployeeName": "Mahfuj Alam",
+        "Email": "mahfuj.acmeai@gmail.com",
+        "Table": "1-C",
+        "BloodGroup": "O+",
+        "Position": "Assistant Team Lead"
+      },
+      {
+        "EmployeeName": "Imran Hossain",
+        "Email": "imran.acmeai@gmail.com",
+        "Table": "1-C",
+        "BloodGroup": "B+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Tasmia Ferdous Oyeshee",
+        "Email": "tasmia.acmeai@gmail.com",
+        "Table": "1-C",
+        "BloodGroup": "O+",
+        "Position": "Production Officer"
+      }
+    ],
+    "OfficeAssistants": [
+      "Md Royal Mia",
+      "Md Selim Mia"
+    ],
+    "ManagementTeamContacts": [
+      {
+        "Name": "Md Mominul Islam Shishir",
+        "Position": "Operation Lead"
+      },
+      {
+        "Name": "Md Zubaer Hossain",
+        "Position": "Operation Manager"
+      },
+      {
+        "Name": "Sumaya Siddiqui",
+        "Position": "Operations and LLM Program Coordinator"
+      },
+      {
+        "Name": "Md Ramjan Islam",
+        "Position": "Project Coordinator"
+      },
+      {
+        "Name": "Md Rashed Khan Milon",
+        "Position": "Project Coordinator"
+      },
+      {
+        "Name": "Tariqul Islam Bablu",
+        "Position": "Project Coordinator"
+      },
+      {
+        "Name": "Omar Faruk",
+        "Position": "ML Engineer"
+      }
+    ]
+  }
+}

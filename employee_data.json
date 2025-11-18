@@ -1,0 +1,99 @@
+{
+"LeaveData":{
+    "LeavePolicies": [
+      {
+        "Type": "Annual/Earned Leave",
+        "Policy": "16 days after one year of service, distributed across four quarters. Up to 4 days of unused leave per quarter can be encashed."
+      },
+      {
+        "Type": "Casual Leave",
+        "Policy": "Maximum of one (01) day can be taken at a time."
+      },
+      {
+        "Type": "Sick Leave",
+        "Policy": "Requires a valid medical document for leave exceeding one day."
+      },
+      {
+        "Type": "Maternity Leave",
+        "Policy": "120 days for confirmed employees with at least 6 months of service."
+      },
+      {
+        "Type": "Leave During Probation",
+        "Policy": "No leave facilities; any day off in an emergency is considered unpaid leave."
+      },
+      {
+        "Type": "Parental Leave",
+        "Policy": "There is currently no policy for parental leave."
+      }
+    ],
+    "LeaveBalanceCheck": "Individual remaining leave days can be checked through the ERP system under the 'Leave Interface' section."
+  },
+  "SalaryData": {
+    "SalaryBreakdown": {
+      "Note": "Components are structured as a percentage of the Gross Salary.",
+      "Components": [
+        {
+          "Component": "Basic Salary",
+          "PercentageOfGrossSalary": "31.25%"
+        },
+        {
+          "Component": "House Rent Allowance",
+          "PercentageOfGrossSalary": "100% of Basic Salary"
+        },
+        {
+          "Component": "Medical Allowance",
+          "PercentageOfGrossSalary": "60% of Basic Salary"
+        },
+        {
+          "Component": "Transport Allowance",
+          "PercentageOfGrossSalary": "35% of Basic Salary"
+        },
+        {
+          "Component": "Mobile Allowance",
+          "PercentageOfGrossSalary": "15% of Basic Salary"
+        },
+        {
+          "Component": "Internet Allowance",
+          "PercentageOfGrossSalary": "10% of Basic Salary"
+        }
+      ]
+    },
+    "OtherMonetaryBenefits": {
+      "EidBonus": {
+        "Policy": "50% of total gross salary for permanent employees who have completed 6 months of service. Prorated bonus otherwise."
+      },
+      "QuarterlyProfitShare": {
+        "Policy": "15% of the profit shared if the company meets the minimum profit set, for employees who have served for at least one year, calculated on a prorated basis."
+      },
+      "MobileBillAllowances": {
+        "Note": "Provided to the operations management team, team leads, and assistant team leads, graded by rank.",
+        "AllowancesByRank": [
+          {
+            "Rank": "Officer",
+            "Amount_TK": 300
+          },
+          {
+            "Rank": "Executive",
+            "Amount_TK": 350
+          },
+          {
+            "Rank": "Senior Executive",
+            "Amount_TK": 500
+          },
+          {
+            "Rank": "Assistant Manager",
+            "Amount_TK": 650
+          },
+          {
+            "Rank": "Deputy Manager",
+            "Amount_TK": 750
+          },
+          {
+            "Rank": "Manager",
+            "Amount_TK": 850
+          }
+        ]
+      }
+    }
+  }
+}
