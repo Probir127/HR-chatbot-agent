@@ -2,115 +2,380 @@
   "EmployeeDetails": {
     "OperationTeam": [
       {
-        "EmployeeName": "Punom Chowhan",
-        "Email": "punom.acmeai@gmail.com",
-        "Table": "1-A",
-        "BloodGroup": "B+",
-        "Position": "Team Lead"
-      },
-      {
-        "EmployeeName": "Saiful Islam Likhon",
-        "Email": "saifulislamlikhon.acmeai@gmail.com",
-        "Table": "1-A",
-        "BloodGroup": "O+",
-        "Position": "Assistant Team Lead"
-      },
-      {
-        "EmployeeName": "Md. Nurshad Hossain Shad",
-        "Email": "nurshadhossainacmeai@gmail.com",
-        "Table": "1-A",
-        "BloodGroup": "O+",
-        "Position": "Production Officer"
-      },
-      {
-        "EmployeeName": "MD. Naymul Islam",
-        "Email": "naymul.acmeai@gmail.com",
+        "EmployeeName": "Md. Asraful Alam Prottoy",
+        "Email": "prottoy.acmeai@gmail.com",
         "Table": "1-A",
         "BloodGroup": "A+",
-        "Position": "Production Officer"
+        "Position": "Deputy Project Coordinator"
       },
       {
-        "EmployeeName": "Sadia Afrin Juthi",
-        "Email": "juthi.acmeai@gmail.com",
-        "Table": "1-B",
+        "EmployeeName": "Farzana Gisan",
+        "Email": "farzana.acmeai@gmail.com",
+        "Table": "1-A",
         "BloodGroup": "O+",
-        "Position": "Team Lead"
+        "Position": "Asst. Team Lead"
       },
       {
         "EmployeeName": "Nazmus Sakib",
         "Email": "nazmus.acmeai@gmail.com",
-        "Table": "1-B",
+        "Table": "1-A",
         "BloodGroup": "O+",
-        "Position": "Assistant Team Lead"
+        "Position": "Executive"
       },
       {
-        "EmployeeName": "Minhaj Uddin",
-        "Email": "minhaj.acmeai@gmail.com",
-        "Table": "1-B",
-        "BloodGroup": "O+",
+        "EmployeeName": "Lipi Akter",
+        "Email": "lipiakter.acmeai@gmail.com",
+        "Table": "1-A",
+        "BloodGroup": "B+",
         "Position": "Production Officer"
       },
       {
-        "EmployeeName": "Md Shakil Ahamed",
-        "Email": "shakil.acmeanno@gmail.com",
-        "Table": "1-C",
+        "EmployeeName": "Mehmud Avy",
+        "Email": "avyacmeai164@gmail.com",
+        "Table": "1-B",
         "BloodGroup": "O+",
         "Position": "Team Lead"
       },
       {
-        "EmployeeName": "Mahfuj Alam",
-        "Email": "mahfuj.acmeai@gmail.com",
+        "EmployeeName": "Tasmia Ferdous Oyeshee",
+        "Email": "tasmia.acmeai@gmail.com",
+        "Table": "1-B",
+        "BloodGroup": "O+",
+        "Position": "Asst. Team Lead"
+      },
+      {
+        "EmployeeName": "Moontaha Zaman",
+        "Email": "moontaha.acmeai@gmail.com",
+        "Table": "1-B",
+        "BloodGroup": "AB+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Akida Hossain Liza",
+        "Email": "liza.acmeai@gmail.com",
+        "Table": "1-B",
+        "BloodGroup": "A+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Md Habibullah Shihab",
+        "Email": "habibullahshihab.acmeai@gmail.com",
+        "Table": "1-B",
+        "BloodGroup": "B+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Khayrul Islam",
+        "Email": "khayrul.acmeai@gmail.com",
         "Table": "1-C",
         "BloodGroup": "O+",
-        "Position": "Assistant Team Lead"
+        "Position": "Team Lead"
       },
       {
         "EmployeeName": "Imran Hossain",
         "Email": "imran.acmeai@gmail.com",
         "Table": "1-C",
         "BloodGroup": "B+",
+        "Position": "Asst. Team Lead"
+      },
+      {
+        "EmployeeName": "Md. Nuruzzaman Nomun",
+        "Email": "aminomun.acmeai@gmail.com",
+        "Table": "1-C",
+        "BloodGroup": "B+",
         "Position": "Production Officer"
       },
       {
-        "EmployeeName": "Tasmia Ferdous Oyeshee",
-        "Email": "tasmia.acmeai@gmail.com",
+        "EmployeeName": "Ahnaf Alvi",
+        "Email": "ahnafalvi.acmeai@gmail.com",
         "Table": "1-C",
+        "BloodGroup": "A+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "S M Sazid Ahammod",
+        "Email": "sazid.acmeai@gmail.com",
+        "Table": "1-C",
+        "BloodGroup": "B+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Md. Razu Ahmed",
+        "Email": "razu.acmeai@gmail.com",
+        "Table": "1-D",
+        "BloodGroup": "O+",
+        "Position": "Team Lead & Sr. QA Executive"
+      },
+      {
+        "EmployeeName": "Md. Sabbir Hossain",
+        "Email": "sabbir.acmeai@gmail.com",
+        "Table": "1-D",
+        "BloodGroup": "B+",
+        "Position": "Asst. Team Lead"
+      },
+      {
+        "EmployeeName": "Bhuban Roy",
+        "Email": "bhuban.acmeai@gmail.com",
+        "Table": "1-D",
+        "BloodGroup": "B+",
+        "Position": "Executive QA & Training"
+      },
+      {
+        "EmployeeName": "Md. Elias Haider",
+        "Email": "elias.limon.acme@gmail.com",
+        "Table": "1-D",
         "BloodGroup": "O+",
         "Position": "Production Officer"
-      }
-    ],
-    "OfficeAssistants": [
-      "Md Royal Mia",
-      "Md Selim Mia"
-    ],
-    "ManagementTeamContacts": [
-      {
-        "Name": "Md Mominul Islam Shishir",
-        "Position": "Operation Lead"
       },
       {
-        "Name": "Md Zubaer Hossain",
-        "Position": "Operation Manager"
+        "EmployeeName": "Ibrahim Khan Riyadh",
+        "Email": "riyadh.acmeai@gmail.com",
+        "Table": "2-A",
+        "BloodGroup": "B+",
+        "Position": "Deputy Project Coordinator"
+      },
+      {
+        "EmployeeName": "Ehsanul Haque",
+        "Email": "ehsan33acmeai@gmail.com",
+        "Table": "2-A",
+        "BloodGroup": "O+",
+        "Position": "Asst. Team Lead"
+      },
+      {
+        "EmployeeName": "Jannatul Ferdous",
+        "Email": "jannat.acmeai@gmail.com",
+        "Table": "2-A",
+        "BloodGroup": "AB+",
+        "Position": "Production Executive"
+      },
+      {
+        "EmployeeName": "Mahfuzul Ahmed",
+        "Email": "mahfuz3210.acmeai@gmail.com",
+        "Table": "2-A",
+        "BloodGroup": "A+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Mirazul Islam Raz",
+        "Email": "miraz.acmeai@gmail.com",
+        "Table": "2-B",
+        "BloodGroup": "O+",
+        "Position": "Team Lead"
+      },
+      {
+        "EmployeeName": "Mahfuzur Rahman",
+        "Email": "mahfuz3210.acmeai@gmail.com",
+        "Table": "2-B",
+        "BloodGroup": "A+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Md. Hosne Rabby",
+        "Email": "rabby.acmeai@gmail.com",
+        "Table": "2-B",
+        "BloodGroup": "O+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Nurjahan Akhter",
+        "Email": "nurjahanakhter.acmeai@gmail.com",
+        "Table": "2-B",
+        "BloodGroup": "A+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Punom Chowhan",
+        "Email": "punom.acmeai@gmail.com",
+        "Table": "2-C",
+        "BloodGroup": "O+",
+        "Position": "Team Lead & Senior Executive"
+      },
+      {
+        "EmployeeName": "Saiful Islam Likhon",
+        "Email": "saifulislamlikhon.acmeai@gmail.com",
+        "Table": "2-C",
+        "BloodGroup": "O+",
+        "Position": "Asst. Team Lead"
+      },
+      {
+        "EmployeeName": "Md. Nurshad Hossain Shad",
+        "Email": "nurshadhossainacmeai@gmail.com",
+        "Table": "2-C",
+        "BloodGroup": "O+",
+        "Position": "Production Officer"
+      },
+      {
+        "EmployeeName": "Md. Nayeemul Islam",
+        "Email": "naymul.acmeai@gmail.com",
+        "Table": "2-C",
+        "BloodGroup": "A+",
+        "Position": "Production Executive"
+      }
+    ],
+
+    "StrategicInterventions": [
+      {
+        "EmployeeName": "Rubyat Raina Nawshe",
+        "Email": "rubyatraina22.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "O+",
+        "Position": "Team Lead - Strategic Support"
+      },
+      {
+        "EmployeeName": "Mosharaf Hossain",
+        "Email": "mosharafacmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "O+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Dewan Rodela Ashrafi",
+        "Email": "dewanrodela.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "O+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Hasibur Rahman Rakib",
+        "Email": "hrrakib.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Effat Un Nabi",
+        "Email": "effat.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "AB+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Tasnim Binte Shiraj",
+        "Email": "tasnim.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Saima Sabiha",
+        "Email": "sabiha.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Shawon Khan",
+        "Email": "shawonacmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "O+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Md Neshad Tasnim",
+        "Email": "neshad.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Victor Dhrubo",
+        "Email": "victor.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B-",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Md. Habibur Rahman",
+        "Email": "habibur.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Sourav Hasan",
+        "Email": "sourav.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "O+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Md. Alve Alam Authi",
+        "Email": "alve.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "AB+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Md. Shefatul Islam",
+        "Email": "mdsifat.acme.ai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Video Analyst"
+      },
+      {
+        "EmployeeName": "Md. Shazidul Islam",
+        "Email": "mdshazidulislam37.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "O+",
+        "Position": "Video Analyst"
+      }
+    ],
+
+    "AdditionalTeams": [
+      {
+        "EmployeeName": "Shahabudin Akhon",
+        "Email": "akhonacmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "O+",
+        "Position": "ML Engineer"
+      },
+      {
+        "EmployeeName": "Jaheen Md. Abrar Khan",
+        "Email": "Jaheen.acmeai@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Management Trainee"
+      },
+      {
+        "EmployeeName": "Anis Sarker",
+        "Email": "ansarker603@gmail.com",
+        "Table": "2-D",
+        "BloodGroup": "B+",
+        "Position": "Full Stack Developer"
+      }
+    ],
+
+    "ProjectCoordinators": [
+      {
+        "Name": "Md Ramjan Islam",
+        "Tables": ["1-A", "1-B", "1-C", "1-D"],
+        "Email": "romjan.acmeai@gmail.com"
+      },
+      {
+        "Name": "Md Kamruzzaman Bhuiyan",
+        "Tables": ["2-A", "2-B", "2-C", "2-D"],
+        "Email": "kamruzzaman.acmeai@gmail.com"
+      }
+    ],
+
+    "ManagementTeamContacts": [
+      {
+        "Name": "Md. Zubaer Hossain",
+        "Position": "Operations Manager",
+        "Email": "zubaer.acmeai@gmail.com"
       },
       {
         "Name": "Sumaya Siddiqui",
-        "Position": "Operations and LLM Program Coordinator"
+        "Position": "Operations Coordinator",
+        "Email": "sumaya.acmeai@gmail.com"
       },
       {
-        "Name": "Md Ramjan Islam",
-        "Position": "Project Coordinator"
+        "Name": "Operations General Email",
+        "Email": "project@acmeai.tech"
       },
       {
-        "Name": "Md Rashed Khan Milon",
-        "Position": "Project Coordinator"
-      },
-      {
-        "Name": "Tariqul Islam Bablu",
-        "Position": "Project Coordinator"
-      },
-      {
-        "Name": "Omar Faruk",
-        "Position": "ML Engineer"
+        "Name": "People Ops Email",
+        "Email": "people@acmeai.tech"
       }
     ]
   }

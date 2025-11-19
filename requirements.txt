@@ -1,5 +1,14 @@
+# Core LangChain
 langchain
 langchain-ollama
 langchain-chroma
-panda
+
+# Web server
+fastapi
+uvicorn
+
+# PDF processing
 pypdf
+
+# Vector database
+chromadb
