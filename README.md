@@ -31,7 +31,7 @@ python vector.py
 
 ### 6. Start the FastAPI Server
 ```bash
-uvicorn api_server:app --reload
+uvicorn api_server:app 
 ```
 
 ---
