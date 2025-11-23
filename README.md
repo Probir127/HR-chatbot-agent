@@ -43,8 +43,7 @@ To run the HR Chatbot backend on a specific host and port, update your `backend.
 
 
 ```
-HOST = "0.0.0.0"
-PORT = 8000
+uvicorn api_server:app  --> uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 
