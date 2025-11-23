@@ -5,7 +5,7 @@
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/probir127/hr-chatbot.git
+git clone https://github.com/Probir127/HR-chatbot-agent.git
 cd hr-chatbot
 ```
 
