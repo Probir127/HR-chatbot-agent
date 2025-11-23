@@ -109,7 +109,7 @@ Copy code
 
 ### Ollama Models
 
-
+```bash
 ollama pull llama3.2
 ollama pull mxbai-embed-large
 System Requirements
