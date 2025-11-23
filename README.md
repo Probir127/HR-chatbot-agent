@@ -24,12 +24,12 @@ ollama pull llama3.2
 ollama pull mxbai-embed-large
 ```
 
-### 5. Build the Vector Database
+### 4. Build the Vector Database
 ```bash
 python vector.py
 ```
 
-### 6. Start the FastAPI Server
+### 5. Start the FastAPI Server
 ```bash
 uvicorn api_server:app 
 ```
