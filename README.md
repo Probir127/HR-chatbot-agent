@@ -36,6 +36,18 @@ uvicorn api_server:app
 
 ---
 
+## Host and Port Configuration
+
+
+To run the HR Chatbot backend on a specific host and port, update your `backend.py` configuration:
+
+
+```
+HOST = "0.0.0.0"
+PORT = 8000
+```
+
+
 ## Usage
 
 ### Run Chatbot in CLI Mode
