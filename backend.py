@@ -1,23 +1,37 @@
 """
-backend.py - Optimized HR Chatbot with Modern LangChain Memory (LCEL)
+backend.py - Optimized HR Chatbot with Dynamic Top-K Retrieval
 """
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_ollama.llms import OllamaLLM
-from langchain_core.output_parsers import StrOutputParser
-from vector import retriever 
+from vector import retriever, get_dynamic_retriever
 from tools import calculator, context_awareness_filter
 import re
 from typing import List, Dict, Optional
 
 # Setup the model
 model = OllamaLLM(
-    model="llama3.2"
+    model="llama3.2",
+    temperature=0.1,
+    max_tokens=1200,
 )
 
 class ConversationContextManager:
     """Manages conversation context intelligently"""
+    
+    @staticmethod
+    def format_history(chat_history: List[Dict], max_exchanges: int = 3) -> str:
+        """Format recent conversation history"""
+        if not chat_history:
+            return ""
+        
+        recent = chat_history[-max_exchanges:]
+        lines = ["RECENT CONVERSATION:"]
+        
+        for i, exchange in enumerate(recent, 1):
+            lines.append(f"{i}. User: {exchange.get('user', '')}")
+            lines.append(f"   Bot: {exchange.get('bot', '')[:150]}...")
+        
+        return "\n".join(lines)
     
     @staticmethod
     def has_reference(question: str) -> bool:
@@ -30,11 +44,8 @@ class ConversationContextManager:
     def is_greeting(question: str) -> bool:
         """Check if the input is a greeting"""
         question_lower = question.lower().strip()
-        
-        # Remove punctuation for checking
         question_clean = re.sub(r'[^\w\s]', '', question_lower)
         
-        # Common greetings
         greetings = [
             'hello', 'hi', 'hey', 'greetings', 'good morning', 
             'good afternoon', 'good evening', 'hi there', 'hey there',
@@ -42,26 +53,52 @@ class ConversationContextManager:
             'good day', 'salaam', 'assalam', 'salam'
         ]
         
-        # Check if it's a short phrase that's just a greeting
         words = question_clean.split()
         
-        # If 4 words or less and contains greeting, it's a greeting
         if len(words) <= 4:
             for greeting in greetings:
                 if greeting in question_lower or question_lower.startswith(greeting):
                     return True
         
         return False
+    
+    @staticmethod
+    def classify_query_complexity(question: str) -> str:
+        """
+        Classify query complexity for optimal retrieval.
+        
+        Returns: 'simple', 'employee_lookup', 'calculation', 'greeting', 'complex'
+        """
+        question_lower = question.lower()
+        
+        if any(word in question_lower for word in ['hello', 'hi', 'hey', 'greetings']):
+            return 'greeting'
+        
+        if any(word in question_lower for word in ['who is', 'who are', 'find employee', 'contact', 'email']):
+            return 'employee_lookup'
+        
+        if any(word in question_lower for word in ['calculate', 'salary', 'breakdown', 'basic salary']):
+            return 'calculation'
+        
+        # Check for complex queries
+        if len(question.split()) > 15 or ('?' in question and question.count('?') > 1):
+            return 'complex'
+        
+        return 'simple'
 
 
-# ENHANCED OPTIMIZED PROMPT WITH MEMORY PLACEHOLDER
-optimized_prompt_template = """You are the official HR Assistant for Acme AI Ltd., designed to provide accurate, helpful, and professional support to employees.
+# ENHANCED OPTIMIZED PROMPT
+optimized_prompt = """You are the official HR Assistant for Acme AI Ltd., designed to provide accurate, helpful, and professional support to employees.
+
+===============================================================================
+CONVERSATION CONTEXT:
+{history}
 
 KNOWLEDGE BASE (HR Policies, Employee Data, Procedures):
 {context}
 
 CURRENT EMPLOYEE QUERY: {question}
-
+===============================================================================
 
 YOUR CORE RESPONSIBILITIES:
 
@@ -74,7 +111,7 @@ YOUR CORE RESPONSIBILITIES:
    - When uncertain, always defer to HR department
 
 2. CONTEXT INTELLIGENCE
-   - Track pronouns (he/she/his/her/it/that/this/they/their) and resolve them using conversation history
+   - Track pronouns (he/she/his/her/it/that/this/they/their) and resolve them using CONVERSATION CONTEXT
    - Maintain conversation continuity - reference previous exchanges naturally
    - Remember subjects being discussed across multiple questions
    - If context is ambiguous, ask for clarification rather than guessing
@@ -105,10 +142,6 @@ YOUR CORE RESPONSIBILITIES:
    - Provide: Full name | Position/Title | Email | Table | Additional context
    - Format: "The [Position] is [Full Name], who [additional role/info]. 
              You can reach them at [email]."
-   - Example: "Who is the COO?" 
-     Answer: "The COO (Chief Operating Officer) is Syed Sadhli Ahmed Roomy, 
-             who is also the Co-Founder of Acme AI Ltd. For operations matters, 
-             contact partnership@acmeai.tech"
 
    B. EMPLOYEE INFORMATION:
    - Include: Name, Position, Email, Table, Blood Group, Team
@@ -129,10 +162,7 @@ YOUR CORE RESPONSIBILITIES:
      * IT: it.team@acmetechltd.com
 
    E. PROCEDURE QUESTIONS:
-   - Format as numbered steps:
-     1. [Action] - [Who to contact]
-     2. [Next action] - [Required documents]
-     3. [Final step] - [Expected timeline]
+   - Format as numbered steps with clear actions
    - Include prerequisites and requirements
    - Mention consequences of missing deadlines
 
@@ -143,97 +173,76 @@ YOUR CORE RESPONSIBILITIES:
    - For critical matters (termination, legal, sensitive), advise consulting HR directly
    - If query is outside HR scope, acknowledge and suggest appropriate department
 
-
+===============================================================================
 PROVIDE YOUR ANSWER NOW (Direct, No Greeting):
 """
 
-# Create prompt with memory placeholder - Modern LCEL approach
-prompt = ChatPromptTemplate.from_messages([
-    ("system", optimized_prompt_template),
-    MessagesPlaceholder(variable_name="chat_history"),
-    ("human", "{question}")
-])
-
-
-class InMemoryHistory:
-    """Simple in-memory chat history store"""
-    
-    def __init__(self):
-        self.store = {}
-    
-    def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
-        if session_id not in self.store:
-            self.store[session_id] = ChatMessageHistory()
-        return self.store[session_id]
-    
-    def clear_session(self, session_id: str):
-        if session_id in self.store:
-            self.store[session_id].clear()
-
+prompt = ChatPromptTemplate.from_template(optimized_prompt)
 
 class HRChatbot:
-    """Optimized HR Chatbot with Modern LangChain Memory (LCEL)"""
+    """Optimized HR Chatbot with Dynamic Top-K Retrieval"""
     
     def __init__(self):
         self.context_mgr = ConversationContextManager()
         self.model = model
         self.retriever = retriever
-        
-        # Modern memory store
-        self.history_store = InMemoryHistory()
-        
-        # Create the base chain using LCEL (modern approach)
-        self.base_chain = prompt | self.model | StrOutputParser()
     
-    def clear_session_memory(self, session_id: str):
-        """Clear memory for a specific session"""
-        self.history_store.clear_session(session_id)
-    
-    def answer(self, question: str, session_id: str = "default") -> str:
-        """Generate contextually aware answer with memory"""
+    def answer(self, question: str, chat_history: Optional[List[Dict]] = None) -> str:
+        """Generate contextually aware answer with optimized retrieval"""
         try:
+            chat_history = chat_history or []
             question_stripped = question.strip()
             
-            # Get session history
-            history = self.history_store.get_session_history(session_id)
-            
-            # DIRECT GREETING HANDLER - Bypass LLM entirely for greetings
+            # DIRECT GREETING HANDLER
             if self.context_mgr.is_greeting(question_stripped):
-                chat_messages = history.messages
-                
-                if len(chat_messages) == 0:
-                    response = "Hello! I'm the HR Chatbot for Acme AI Ltd. How can I help you with HR-related questions today?"
+                if len(chat_history) == 0:
+                    return "Hello! I'm the HR Chatbot for Acme AI Ltd. How can I help you with HR-related questions today?"
                 else:
-                    response = "Hello! How can I assist you?"
-                
-                # Manually add to history
-                history.add_user_message(question_stripped)
-                history.add_ai_message(response)
-                
-                return response
+                    return "Hello! How can I assist you?"
             
-            # Get relevant documents
-            retrieved_docs = self.retriever.invoke(question_stripped)
+            # Classify query complexity
+            query_type = self.context_mgr.classify_query_complexity(question)
+            
+            # Format history only if question has references
+            if self.context_mgr.has_reference(question):
+                history_text = self.context_mgr.format_history(chat_history)
+            else:
+                history_text = ""
+            
+            # Get retriever with optimal k based on query type
+            dynamic_retriever = get_dynamic_retriever(question)
+            
+            # Get relevant documents with optimized k
+            retrieved_docs = dynamic_retriever.invoke(question)
+            
+            # Limit context to prevent overwhelming the model
+            context_limit = {
+                'greeting': 500,
+                'employee_lookup': 1500,
+                'calculation': 1000,
+                'simple': 2500,
+                'complex': 3500
+            }.get(query_type, 2500)
+            
             context_text = "\n---\n".join([doc.page_content for doc in retrieved_docs])
+            context_text = context_text[:context_limit]
             
-            # Get chat history for the prompt
-            chat_messages = history.messages
+            # Build prompt
+            full_prompt = prompt.format(
+                history=history_text,
+                context=context_text,
+                question=question
+            )
             
-            # Invoke base chain directly with chat history
-            response = self.base_chain.invoke({
-                "context": context_text[:3000],
-                "question": question_stripped,
-                "chat_history": chat_messages
-            })
-            
-            # Manually add to history
-            history.add_user_message(question_stripped)
-            history.add_ai_message(response)
+            # Get response
+            response = self.model.invoke(full_prompt)
             
             # Clean response
             cleaned = context_awareness_filter.invoke({"response": response})
             cleaned = self._clean_followup(cleaned)
-            cleaned = self._handle_calc(cleaned, question_stripped)
+            
+            # Handle calculations
+            cleaned = self._handle_calc(cleaned, question)
             
             # Final validation
             if not cleaned or len(cleaned.strip()) < 5:
@@ -243,8 +252,6 @@ class HRChatbot:
             
         except Exception as e:
             print(f"Error in answer(): {str(e)}")
-            import traceback
-            traceback.print_exc()
             return "I apologize, but I encountered an error processing your request. Please try again."
     
     def _clean_followup(self, text: str) -> str:
@@ -296,29 +303,19 @@ class HRChatbot:
 hr_chatbot = HRChatbot()
 
 def ask_hr_bot(question: str, chat_history: Optional[List[Dict]] = None, session_id: Optional[str] = None) -> str:
-    """Main function - now uses session_id for memory"""
-    if session_id is None:
-        session_id = "default"
-    
-    return hr_chatbot.answer(question, session_id)
+    """Main function"""
+    return hr_chatbot.answer(question, chat_history)
 
 def ask_hr_bot_api(question: str, chat_history: Optional[List[Dict]] = None, session_id: Optional[str] = None) -> str:
-    """API wrapper - uses session_id for memory management"""
-    if session_id is None:
-        session_id = "default"
-    
+    """API wrapper"""
     return ask_hr_bot(question, chat_history, session_id)
-
-def clear_session(session_id: str = "default"):
-    """Clear memory for a specific session"""
-    hr_chatbot.clear_session_memory(session_id)
 
 
 if __name__ == "__main__":
-    print("🤖 HR Chatbot with Modern LangChain Memory (LCEL)")
+    print("🤖 HR Chatbot with Optimized Dynamic Top-K Retrieval")
     print("Commands: 'clear' | 'quit'\n")
     
-    session_id = "test_session"
+    chat_history = []
     
     while True:
         try:
@@ -332,13 +329,20 @@ if __name__ == "__main__":
                 break
             
             if question.lower() == 'clear':
-                clear_session(session_id)
-                print("✓ Memory cleared")
+                chat_history = []
+                print("✓ History cleared")
                 continue
             
-            # Get answer (memory is handled internally)
-            answer = ask_hr_bot(question, session_id=session_id)
+            # Get answer
+            answer = ask_hr_bot(question, chat_history)
             print(f"\nBot: {answer}")
+            
+            # Update history
+            chat_history.append({"user": question, "bot": answer})
+            
+            # Keep last 10
+            if len(chat_history) > 10:
+                chat_history = chat_history[-10:]
                 
         except KeyboardInterrupt:
             print("\n\nGoodbye! 👋")
