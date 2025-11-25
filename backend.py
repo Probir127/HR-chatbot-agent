@@ -1,8 +1,11 @@
 """
-backend.py - Optimized HR Chatbot with Advanced Context Awareness and Greeting Handler
+backend.py - Optimized HR Chatbot with Modern LangChain Memory (LCEL)
 """
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_ollama.llms import OllamaLLM
+from langchain_core.output_parsers import StrOutputParser
 from vector import retriever 
 from tools import calculator, context_awareness_filter
 import re
@@ -10,28 +13,11 @@ from typing import List, Dict, Optional
 
 # Setup the model
 model = OllamaLLM(
-    model="llama3.2",
-    temperature=0.1,
-    max_tokens=1200,
+    model="llama3.2"
 )
 
 class ConversationContextManager:
     """Manages conversation context intelligently"""
-    
-    @staticmethod
-    def format_history(chat_history: List[Dict], max_exchanges: int = 3) -> str:
-        """Format recent conversation history"""
-        if not chat_history:
-            return ""
-        
-        recent = chat_history[-max_exchanges:]
-        lines = ["RECENT CONVERSATION:"]
-        
-        for i, exchange in enumerate(recent, 1):
-            lines.append(f"{i}. User: {exchange.get('user', '')}")
-            lines.append(f"   Bot: {exchange.get('bot', '')[:150]}...")
-        
-        return "\n".join(lines)
     
     @staticmethod
     def has_reference(question: str) -> bool:
@@ -68,131 +54,186 @@ class ConversationContextManager:
         return False
 
 
-# ENHANCED OPTIMIZED PROMPT
-optimized_prompt = """You are the official HR Assistant for Acme AI Ltd. - a professional, knowledgeable, and helpful chatbot.
+# ENHANCED OPTIMIZED PROMPT WITH MEMORY PLACEHOLDER
+optimized_prompt_template = """You are the official HR Assistant for Acme AI Ltd., designed to provide accurate, helpful, and professional support to employees.
 
-{history}
-
-RELEVANT HR KNOWLEDGE:
+KNOWLEDGE BASE (HR Policies, Employee Data, Procedures):
 {context}
 
-EMPLOYEE QUESTION: {question}
+CURRENT EMPLOYEE QUERY: {question}
 
-YOUR ROLE & INSTRUCTIONS:
-1. **Accuracy & Reliability**: 
-   - Answer ONLY based on the HR knowledge provided above
-   - If information is not available, clearly state: "I don't have that specific information. Please contact HR at people@acmeai.tech or call +8801313094329."
-   - Never invent or assume information
 
-2. **Context Awareness**:
-   - If the question contains pronouns (he, she, his, her, it, that, this, they, their), carefully check the RECENT CONVERSATION to identify the reference
-   - Maintain conversation continuity and remember what was discussed
+YOUR CORE RESPONSIBILITIES:
 
-3. **Response Style**:
-   - Be direct, professional, and helpful
-   - Do NOT start responses with greetings like "Hello" or "Hi" - jump straight to the answer
-   - Use clear, concise language appropriate for workplace communication
-   - Format lists and steps clearly when providing procedures
+1. ACCURACY & TRUST
+   - Answer EXCLUSIVELY from the knowledge base provided above
+   - If information is unavailable or unclear, respond with:
+     "I don't have that specific information in my current knowledge base. 
+      Please contact HR at people@acmeai.tech or call +8801313094329 for accurate details."
+   - NEVER fabricate, guess, or assume information
+   - When uncertain, always defer to HR department
 
-4. **Calculations**:
-   - For mathematical calculations (salary, percentages, deductions), use: CALCULATOR: [expression]
-   - Examples: 
-     * CALCULATOR: 40000 * 0.3125 (basic salary)
-     * CALCULATOR: 16 / 4 (quarterly leave)
-   - Only use calculator for explicit calculation requests, not for policy explanations
+2. CONTEXT INTELLIGENCE
+   - Track pronouns (he/she/his/her/it/that/this/they/their) and resolve them using conversation history
+   - Maintain conversation continuity - reference previous exchanges naturally
+   - Remember subjects being discussed across multiple questions
+   - If context is ambiguous, ask for clarification rather than guessing
 
-5. **Specific Query Handling**:
-   - **"Who is..." Questions**: 
-     * Search thoroughly in employee database and management contacts
-     * Provide: Full name + Position/Title + Email + Additional details (table, phone if available)
-     * Example: "Who is the COO?" → "The COO (Chief Operating Officer) is Syed Sadhli Ahmed Roomy, who is also the Co-Founder of Acme AI Ltd."
-     * For positions without specific names, explain the role clearly
+3. COMMUNICATION STYLE
+   - Be direct and professional - NO greetings in follow-up responses
+   - Use clear, workplace-appropriate language
+   - Structure complex information with bullets or numbered lists
+   - Keep responses concise but complete - avoid unnecessary verbosity
+   - Use empathetic tone while maintaining professionalism
+
+4. CALCULATIONS & NUMBERS
+   - For ALL mathematical operations, use: CALCULATOR: [expression]
    
-   - **Employee Information**: 
-     * Provide complete details: name, position, email, table number, blood group
-     * For team/department queries, list all relevant members
-     * Include reporting structure when relevant
+   Examples:
+   * Salary calculation: CALCULATOR: 40000 * 0.3125
+   * Leave division: CALCULATOR: 16 / 4
+   * Deduction: CALCULATOR: 1800 * 5
+   * Percentage: CALCULATOR: 50000 * 0.5
    
-   - **Policies**: 
-     * Explain clearly with all relevant details, procedures, and requirements
-     * Include specific numbers, percentages, and timeframes
-     * Mention any exceptions or special cases
-   
-   - **Contact Info**: 
-     * Always include email addresses and phone numbers from the knowledge base
-     * For HR queries, mention: people@acmeai.tech or +8801313094329
-     * For operations: project@acmeai.tech
-   
-   - **Dates & Deadlines**: 
-     * Be specific with timelines and notice periods
-     * Include any consequences of missing deadlines
-   
-   - **Procedures**: 
-     * List steps clearly and in numbered order
-     * Include who to contact at each step
-     * Mention required documents or prerequisites
+   - Never calculate manually - always use CALCULATOR format
+   - Explain what the calculation represents in context
 
-6. **Professional Standards**:
-   - Maintain confidentiality and respect for all employees
-   - Be neutral and fair in all responses
-   - Encourage employees to verify critical information with HR when needed
+5. SPECIALIZED QUERY HANDLING
 
-PROVIDE YOUR ANSWER (NO GREETING, DIRECT RESPONSE):
+   A. "WHO IS..." QUESTIONS:
+   - Search: Employee database + Management contacts + Job roles
+   - Provide: Full name | Position/Title | Email | Table | Additional context
+   - Format: "The [Position] is [Full Name], who [additional role/info]. 
+             You can reach them at [email]."
+   - Example: "Who is the COO?" 
+     Answer: "The COO (Chief Operating Officer) is Syed Sadhli Ahmed Roomy, 
+             who is also the Co-Founder of Acme AI Ltd. For operations matters, 
+             contact partnership@acmeai.tech"
+
+   B. EMPLOYEE INFORMATION:
+   - Include: Name, Position, Email, Table, Blood Group, Team
+   - For team queries: List all members with complete details
+   - For hierarchy queries: Show reporting structure clearly
+
+   C. POLICY QUESTIONS:
+   - Explain thoroughly with specific details
+   - Include: Eligibility criteria, timeframes, procedures, exceptions
+   - Cite specific numbers, percentages, and deadlines
+   - Add: "For clarification, contact HR at people@acmeai.tech"
+
+   D. CONTACT REQUESTS:
+   - Always provide: Email + Phone number (if available)
+   - Key contacts:
+     * HR: people@acmeai.tech | +8801313094329
+     * Operations: project@acmeai.tech
+     * IT: it.team@acmetechltd.com
+
+   E. PROCEDURE QUESTIONS:
+   - Format as numbered steps:
+     1. [Action] - [Who to contact]
+     2. [Next action] - [Required documents]
+     3. [Final step] - [Expected timeline]
+   - Include prerequisites and requirements
+   - Mention consequences of missing deadlines
+
+6. QUALITY STANDARDS
+   - Maintain strict confidentiality
+   - Be impartial and fair to all employees
+   - Respect cultural and personal sensitivities
+   - For critical matters (termination, legal, sensitive), advise consulting HR directly
+   - If query is outside HR scope, acknowledge and suggest appropriate department
+
+
+PROVIDE YOUR ANSWER NOW (Direct, No Greeting):
 """
 
-prompt = ChatPromptTemplate.from_template(optimized_prompt)
+# Create prompt with memory placeholder - Modern LCEL approach
+prompt = ChatPromptTemplate.from_messages([
+    ("system", optimized_prompt_template),
+    MessagesPlaceholder(variable_name="chat_history"),
+    ("human", "{question}")
+])
+
+
+class InMemoryHistory:
+    """Simple in-memory chat history store"""
+    
+    def __init__(self):
+        self.store = {}
+    
+    def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
+        if session_id not in self.store:
+            self.store[session_id] = ChatMessageHistory()
+        return self.store[session_id]
+    
+    def clear_session(self, session_id: str):
+        if session_id in self.store:
+            self.store[session_id].clear()
+
 
 class HRChatbot:
-    """Optimized HR Chatbot"""
+    """Optimized HR Chatbot with Modern LangChain Memory (LCEL)"""
     
     def __init__(self):
         self.context_mgr = ConversationContextManager()
         self.model = model
         self.retriever = retriever
+        
+        # Modern memory store
+        self.history_store = InMemoryHistory()
+        
+        # Create the base chain using LCEL (modern approach)
+        self.base_chain = prompt | self.model | StrOutputParser()
     
-    def answer(self, question: str, chat_history: Optional[List[Dict]] = None) -> str:
-        """Generate contextually aware answer"""
+    def clear_session_memory(self, session_id: str):
+        """Clear memory for a specific session"""
+        self.history_store.clear_session(session_id)
+    
+    def answer(self, question: str, session_id: str = "default") -> str:
+        """Generate contextually aware answer with memory"""
         try:
-            chat_history = chat_history or []
             question_stripped = question.strip()
+            
+            # Get session history
+            history = self.history_store.get_session_history(session_id)
             
             # DIRECT GREETING HANDLER - Bypass LLM entirely for greetings
             if self.context_mgr.is_greeting(question_stripped):
-                if len(chat_history) == 0:
-                    # First interaction - full greeting
-                    return "Hello! I'm the HR Chatbot for Acme AI Ltd. How can I help you with HR-related questions today?"
+                chat_messages = history.messages
+                
+                if len(chat_messages) == 0:
+                    response = "Hello! I'm the HR Chatbot for Acme AI Ltd. How can I help you with HR-related questions today?"
                 else:
-                    # Subsequent greeting - shorter response
-                    return "Hello! How can I assist you?"
-            
-            # Format history only if question has references
-            if self.context_mgr.has_reference(question):
-                history_text = self.context_mgr.format_history(chat_history)
-            else:
-                history_text = ""
+                    response = "Hello! How can I assist you?"
+                
+                # Manually add to history
+                history.add_user_message(question_stripped)
+                history.add_ai_message(response)
+                
+                return response
             
             # Get relevant documents
-            retrieved_docs = self.retriever.invoke(question)
+            retrieved_docs = self.retriever.invoke(question_stripped)
             context_text = "\n---\n".join([doc.page_content for doc in retrieved_docs])
             
-            # Build prompt
-            full_prompt = prompt.format(
-                history=history_text,
-                context=context_text[:3000],  # Limit context size
-                question=question
-            )
+            # Get chat history for the prompt
+            chat_messages = history.messages
             
-            # Get response
-            response = self.model.invoke(full_prompt)
+            # Invoke base chain directly with chat history
+            response = self.base_chain.invoke({
+                "context": context_text[:3000],
+                "question": question_stripped,
+                "chat_history": chat_messages
+            })
             
-            # Clean response - ALWAYS remove greetings
+            # Manually add to history
+            history.add_user_message(question_stripped)
+            history.add_ai_message(response)
+            
+            # Clean response
             cleaned = context_awareness_filter.invoke({"response": response})
-            
-            # Remove any greeting the LLM added
             cleaned = self._clean_followup(cleaned)
-            
-            # Handle calculations
-            cleaned = self._handle_calc(cleaned, question)
+            cleaned = self._handle_calc(cleaned, question_stripped)
             
             # Final validation
             if not cleaned or len(cleaned.strip()) < 5:
@@ -202,6 +243,8 @@ class HRChatbot:
             
         except Exception as e:
             print(f"Error in answer(): {str(e)}")
+            import traceback
+            traceback.print_exc()
             return "I apologize, but I encountered an error processing your request. Please try again."
     
     def _clean_followup(self, text: str) -> str:
@@ -253,19 +296,29 @@ class HRChatbot:
 hr_chatbot = HRChatbot()
 
 def ask_hr_bot(question: str, chat_history: Optional[List[Dict]] = None, session_id: Optional[str] = None) -> str:
-    """Main function"""
-    return hr_chatbot.answer(question, chat_history)
+    """Main function - now uses session_id for memory"""
+    if session_id is None:
+        session_id = "default"
+    
+    return hr_chatbot.answer(question, session_id)
 
 def ask_hr_bot_api(question: str, chat_history: Optional[List[Dict]] = None, session_id: Optional[str] = None) -> str:
-    """API wrapper"""
+    """API wrapper - uses session_id for memory management"""
+    if session_id is None:
+        session_id = "default"
+    
     return ask_hr_bot(question, chat_history, session_id)
+
+def clear_session(session_id: str = "default"):
+    """Clear memory for a specific session"""
+    hr_chatbot.clear_session_memory(session_id)
 
 
 if __name__ == "__main__":
-    print("🤖 HR Chatbot with Context Awareness")
+    print("🤖 HR Chatbot with Modern LangChain Memory (LCEL)")
     print("Commands: 'clear' | 'quit'\n")
     
-    chat_history = []
+    session_id = "test_session"
     
     while True:
         try:
@@ -279,20 +332,13 @@ if __name__ == "__main__":
                 break
             
             if question.lower() == 'clear':
-                chat_history = []
-                print("✓ History cleared")
+                clear_session(session_id)
+                print("✓ Memory cleared")
                 continue
             
-            # Get answer
-            answer = ask_hr_bot(question, chat_history)
+            # Get answer (memory is handled internally)
+            answer = ask_hr_bot(question, session_id=session_id)
             print(f"\nBot: {answer}")
-            
-            # Update history
-            chat_history.append({"user": question, "bot": answer})
-            
-            # Keep last 10
-            if len(chat_history) > 10:
-                chat_history = chat_history[-10:]
                 
         except KeyboardInterrupt:
             print("\n\nGoodbye! 👋")
