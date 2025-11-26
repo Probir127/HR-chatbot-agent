@@ -1,16 +1,18 @@
-# vector.py - Optimized version with dynamic top-k relevance
+# vector.py - Optimized version with dynamic top-k relevance and improved accuracy
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader, JSONLoader
 from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 import os 
 import json
+import re
 
 # --- 1. Configuration ---
 
 PDF_PATH = 'General HR Queries.pdf'
 EMPLOYEE_DATA_PATH = 'employees.json'
+HR_DATA_PATH = 'employee_data.json'
 
 # TOP-K RELEVANCE CONFIGURATION
 # Optimized based on query complexity and context window
@@ -19,7 +21,8 @@ TOP_K_CONFIG = {
     'employee_search': 5,   # Employee lookup queries
     'calculation': 3,       # Salary/leave calculations
     'greeting': 1,          # Simple greetings
-    'complex': 12           # Multi-faceted queries
+    'complex': 12,          # Multi-faceted queries
+    'executive': 4          # Executive queries (COO, Chairman, etc.)
 }
 
 embeddings = OllamaEmbeddings(
@@ -59,10 +62,20 @@ if add_documents:
     for page in pages:
         try:
             split_docs = markdown_splitter.split_text(page.page_content)
+            for doc in split_docs:
+                # Add metadata for better traceability
+                doc.metadata.update({"source": PDF_PATH, "page": page.metadata.get("page", "unknown"), "type": "pdf"})
             all_documents.extend(split_docs)
         except Exception as e:
             print(f"Warning: Could not split page with markdown: {e}")
-            all_documents.append(page)
+            # Fallback to RecursiveCharacterTextSplitter if markdown splitting fails
+            fallback_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+            fallback_docs = fallback_splitter.split_text(page.page_content)
+            for chunk in fallback_docs:
+                all_documents.append(Document(
+                    page_content=chunk,
+                    metadata={"source": PDF_PATH, "page": page.metadata.get("page", "unknown"), "type": "pdf"}
+                ))
     
     print(f"Processed PDF into {len(all_documents)} markdown-structured documents.")
 
@@ -151,7 +164,53 @@ if add_documents:
     except Exception as e:
         print(f"Warning: Could not load employee data: {e}")
 
-    # **STEP D: Final splitting for any large chunks**
+    # **STEP D: Load HR policies and management data**
+    try:
+        with open(HR_DATA_PATH, 'r', encoding='utf-8') as f:
+            hr_data = json.load(f)
+        
+        hr_docs = []
+        
+        # Process Management Team (COO, Chairman, Founder)
+        if "ManagementTeam" in hr_data:
+            for role, info in hr_data["ManagementTeam"].items():
+                doc_text = f"""
+                {role.upper()}: {info["Name"]}
+                Position: {info["Position"]}
+                Type: Executive Management
+                """
+                hr_docs.append(Document(
+                    page_content=doc_text,
+                    metadata={"source": "employee_data.json", "type": "executive", "role": role}
+                ))
+        
+        # Process Leave Policies
+        if "LeaveData" in hr_data:
+            leave_text = "Leave Policies:\n"
+            for policy in hr_data["LeaveData"].get("LeavePolicies", []):
+                leave_text += f"- {policy['Type']}: {policy['Policy']}\n"
+            hr_docs.append(Document(
+                page_content=leave_text,
+                metadata={"source": "employee_data.json", "type": "leave_policies"}
+            ))
+        
+        # Process Salary Data
+        if "SalaryData" in hr_data:
+            salary_text = "Salary Structure:\n"
+            for component in hr_data["SalaryData"].get("SalaryBreakdown", {}).get("Components", []):
+                salary_text += f"- {component['Component']}: {component['PercentageOfGrossSalary']}\n"
+            hr_docs.append(Document(
+                page_content=salary_text,
+                metadata={"source": "employee_data.json", "type": "salary_data"}
+            ))
+        
+        all_documents.extend(hr_docs)
+        print(f"Added {len(hr_docs)} HR policy documents to the database.")
+        
+    except Exception as e:
+        print(f"Warning: Could not load HR data: {e}")
+
+    # **STEP E: Final splitting for any large chunks**
     # Optimized chunk size for better retrieval
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=800,      # Reduced from 1000 for more precise chunks
@@ -161,7 +220,7 @@ if add_documents:
     documents = text_splitter.split_documents(all_documents)
     print(f"Total documents after final splitting: {len(documents)}")
 
-    # **STEP E: Create, embed, and persist the database**
+    # **STEP F: Create, embed, and persist the database**
     vector_store = Chroma.from_documents(
         documents=documents, 
         embedding=embeddings, 
@@ -193,7 +252,9 @@ def get_dynamic_retriever(query: str, k: int = None):
         query_lower = query.lower()
         
         # Determine query type and set appropriate k
-        if any(word in query_lower for word in ['who is', 'who are', 'find employee', 'contact', 'email']):
+        if any(word in query_lower for word in ['coo', 'chairman', 'founder', 'ceo', 'director']):
+            k = TOP_K_CONFIG['executive']
+        elif any(word in query_lower for word in ['who is', 'who are', 'find employee', 'contact', 'email']):
             k = TOP_K_CONFIG['employee_search']
         elif any(word in query_lower for word in ['calculate', 'salary', 'breakdown', 'basic salary']):
             k = TOP_K_CONFIG['calculation']
@@ -207,14 +268,11 @@ def get_dynamic_retriever(query: str, k: int = None):
     return vector_store.as_retriever(
         search_kwargs={
             "k": k,
-            # Optionally add MMR (Maximum Marginal Relevance) for diversity
-            # "fetch_k": k * 2,  # Fetch 2x documents then re-rank
         }
     )
 
 # --- 4. Create Default Retriever ---
-# Use default k=8 as baseline (optimized from 10)
-retriever = vector_store.as_retriever(search_kwargs={"k": 8})
+retriever = vector_store.as_retriever(search_kwargs={"k": 10})
 
-print(f"Retriever initialized successfully with default k=8")
+print(f"Retriever initialized successfully with default k=10")
 print(f"Dynamic retriever available via get_dynamic_retriever()")
