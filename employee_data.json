@@ -1,5 +1,19 @@
 {
-"LeaveData":{
+  "ManagementTeam": {
+    "COO": {
+      "Name": "Syed Sadhli Ahmed Roomy",
+      "Position": "Chief Operating Officer & Co-Founder"
+    },
+    "Chairman": {
+      "Name": "Major Gen Syed Fatemy Ahmed Roomy (Retd)",
+      "Position": "Chairman"
+    },
+    "Founder": {
+      "Name": "Syed Sharek Ahmed Roomy", 
+      "Position": "Founder"
+    }
+  },
+  "LeaveData": {
     "LeavePolicies": [
       {
         "Type": "Annual/Earned Leave",
