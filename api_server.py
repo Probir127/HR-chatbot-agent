@@ -432,7 +432,7 @@ async def delete_session(
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Starting HR Chatbot API Server with Authentication...")
+    print(" Starting HR Chatbot API Server with Authentication...")
     uvicorn.run(
         "api_server:app",
         host="0.0.0.0",
