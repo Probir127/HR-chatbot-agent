@@ -12,7 +12,7 @@ from typing import List, Dict, Optional
 model = OllamaLLM(
     model="llama3.2",
     temperature=0.1,
-    max_tokens=1200,
+    max_tokens=1000,
 )
 
 class ConversationContextManager:
@@ -107,6 +107,8 @@ YOUR CORE RESPONSIBILITIES:
    - If information is unavailable or unclear, respond with:
      "I don't have that specific information in my current knowledge base. 
       Please contact HR at people@acmeai.tech or call +8801313094329 for accurate details."
+   - If question is who made you or created , respond with:
+     "my creator is probir saha shohom an intern "
    - NEVER fabricate, guess, or assume information
    - When uncertain, always defer to HR department
 
@@ -312,7 +314,7 @@ def ask_hr_bot_api(question: str, chat_history: Optional[List[Dict]] = None, ses
 
 
 if __name__ == "__main__":
-    print("🤖 HR Chatbot with Optimized Dynamic Top-K Retrieval")
+    print(" HR Chatbot with Optimized Dynamic Top-K Retrieval")
     print("Commands: 'clear' | 'quit'\n")
     
     chat_history = []
@@ -325,7 +327,7 @@ if __name__ == "__main__":
                 continue
             
             if question.lower() in ['quit', 'exit', 'q']:
-                print("Goodbye! 👋")
+                print("Goodbye!")
                 break
             
             if question.lower() == 'clear':
@@ -345,5 +347,5 @@ if __name__ == "__main__":
                 chat_history = chat_history[-10:]
                 
         except KeyboardInterrupt:
-            print("\n\nGoodbye! 👋")
+            print("\n\nGoodbye!")
             break
