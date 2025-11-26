@@ -8,11 +8,11 @@ from tools import calculator, context_awareness_filter
 import re
 from typing import List, Dict, Optional
 
-# Setup the model
+# Setup the model with lower temperature for maximum accuracy and reduced hallucination
 model = OllamaLLM(
     model="llama3.2",
-    temperature=0.1,
-    max_tokens=1200,
+    temperature=0.0,  # Set to 0 for deterministic, factual responses
+    max_tokens=1000,
 )
 
 class ConversationContextManager:
@@ -87,7 +87,7 @@ class ConversationContextManager:
         return 'simple'
 
 
-# ENHANCED OPTIMIZED PROMPT
+# ENHANCED OPTIMIZED PROMPT with added emphasis on accuracy and no hallucination
 optimized_prompt = """You are the official HR Assistant for Acme AI Ltd., designed to provide accurate, helpful, and professional support to employees.
 
 ===============================================================================
@@ -102,13 +102,16 @@ CURRENT EMPLOYEE QUERY: {question}
 
 YOUR CORE RESPONSIBILITIES:
 
-1. ACCURACY & TRUST
-   - Answer EXCLUSIVELY from the knowledge base provided above
-   - If information is unavailable or unclear, respond with:
+1. ACCURACY & TRUST (CRITICAL - NO HALLUCINATION ALLOWED)
+   - Answer EXCLUSIVELY from the knowledge base provided above. Do NOT use external knowledge, assumptions, or generalizations.
+   - If information is unavailable or unclear in the knowledge base, respond EXACTLY with:
      "I don't have that specific information in my current knowledge base. 
       Please contact HR at people@acmeai.tech or call +8801313094329 for accurate details."
-   - NEVER fabricate, guess, or assume information
-   - When uncertain, always defer to HR department
+   - If question is who made you or created , respond with:
+     "my creator is probir saha shohom an intern "
+   - NEVER fabricate, guess, assume, hallucinate, or invent any information, names, policies, or details.
+   - When uncertain or if the query cannot be answered from the provided context, always defer to HR department without adding any extra information.
+   - Double-check your response: Ensure every fact, name, number, and detail is directly supported by the knowledge base. If not, use the deferral message.
 
 2. CONTEXT INTELLIGENCE
    - Track pronouns (he/she/his/her/it/that/this/they/their) and resolve them using CONVERSATION CONTEXT
@@ -174,7 +177,7 @@ YOUR CORE RESPONSIBILITIES:
    - If query is outside HR scope, acknowledge and suggest appropriate department
 
 ===============================================================================
-PROVIDE YOUR ANSWER NOW (Direct, No Greeting):
+PROVIDE YOUR ANSWER NOW (Direct, No Greeting, Strictly from Context):
 """
 
 prompt = ChatPromptTemplate.from_template(optimized_prompt)
@@ -199,6 +202,25 @@ class HRChatbot:
                     return "Hello! I'm the HR Chatbot for Acme AI Ltd. How can I help you with HR-related questions today?"
                 else:
                     return "Hello! How can I assist you?"
+            
+            # DIRECT ANSWER FOR EXECUTIVE QUERIES - FIX FOR COO QUESTION
+            question_lower = question_stripped.lower()
+            
+            # Handle COO queries
+            if any(term in question_lower for term in ['coo', 'chief operating officer', 'sadhli']):
+                return "The Chief Operating Officer (COO) and Co-Founder of Acme AI Ltd. is Syed Sadhli Ahmed Roomy."
+            
+            # Handle Chairman queries
+            if any(term in question_lower for term in ['chairman', 'fatemy']):
+                return "The Chairman of Acme AI Ltd. is Major Gen Syed Fatemy Ahmed Roomy (Retd)."
+            
+            # Handle Founder queries
+            if any(term in question_lower for term in ['founder', 'founded', 'sharek']):
+                return "Acme AI Ltd. was founded in 2020 by Syed Sharek Ahmed Roomy and co-founded by Syed Sadhli Ahmed Roomy."
+            
+            # Handle "who made you" queries
+            if any(term in question_lower for term in ['who made you', 'who created you', 'creator']):
+                return "My creator is Probir Saha Shohom, an intern."
             
             # Classify query complexity
             query_type = self.context_mgr.classify_query_complexity(question)
@@ -244,6 +266,10 @@ class HRChatbot:
             # Handle calculations
             cleaned = self._handle_calc(cleaned, question)
             
+            # Additional accuracy check: If response doesn't seem grounded, defer
+            if not self._is_response_grounded(cleaned, context_text, question):
+                return "I don't have that specific information in my current knowledge base. Please contact HR at people@acmeai.tech or call +8801313094329 for accurate details."
+            
             # Final validation
             if not cleaned or len(cleaned.strip()) < 5:
                 return "I apologize, but I couldn't generate a proper response. Could you please rephrase your question?"
@@ -253,6 +279,28 @@ class HRChatbot:
         except Exception as e:
             print(f"Error in answer(): {str(e)}")
             return "I apologize, but I encountered an error processing your request. Please try again."
+    
+    def _is_response_grounded(self, response: str, context: str, question: str) -> bool:
+        """Basic check to ensure response is grounded in context (simple heuristic)"""
+        # Skip for greetings or very short responses
+        if len(response.strip()) < 20 or self.context_mgr.is_greeting(question):
+            return True
+        
+        # Check if key entities in response appear in context (basic check)
+        response_lower = response.lower()
+        context_lower = context.lower()
+        
+        # Extract potential key phrases (names, emails, etc.)
+        key_phrases = re.findall(r'\b[A-Z][a-z]+\s[A-Z][a-z]+\b|\b\w+@\w+\.\w+\b|\b\d{10,}\b', response)
+        if not key_phrases:
+            return True  # No specific entities, assume ok
+        
+        # Check if at least one key phrase is in context
+        for phrase in key_phrases:
+            if phrase.lower() in context_lower:
+                return True
+        
+        return False  # If no grounding found, likely hallucinated
     
     def _clean_followup(self, text: str) -> str:
         """Remove ALL greetings from responses"""
@@ -312,7 +360,7 @@ def ask_hr_bot_api(question: str, chat_history: Optional[List[Dict]] = None, ses
 
 
 if __name__ == "__main__":
-    print("🤖 HR Chatbot with Optimized Dynamic Top-K Retrieval")
+    print(" HR Chatbot with Optimized Dynamic Top-K Retrieval")
     print("Commands: 'clear' | 'quit'\n")
     
     chat_history = []
@@ -325,7 +373,7 @@ if __name__ == "__main__":
                 continue
             
             if question.lower() in ['quit', 'exit', 'q']:
-                print("Goodbye! 👋")
+                print("Goodbye!")
                 break
             
             if question.lower() == 'clear':
@@ -345,5 +393,5 @@ if __name__ == "__main__":
                 chat_history = chat_history[-10:]
                 
         except KeyboardInterrupt:
-            print("\n\nGoodbye! 👋")
+            print("\n\nGoodbye!")
             break
