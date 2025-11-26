@@ -115,12 +115,12 @@ def calculator(expression: str) -> str:
         # Safety check - only allow basic math operations
         allowed_chars = set('0123456789+-*/.() ')
         if not all(c in allowed_chars for c in expression):
-            return "❌ Error: Only basic arithmetic operations (+, -, *, /, .) and numbers are allowed."
+            return " Error: Only basic arithmetic operations (+, -, *, /, .) and numbers are allowed."
         
         # Prevent dangerous operations
         dangerous_patterns = ['import', 'exec', 'eval', '__', 'open', 'file']
         if any(pattern in expression.lower() for pattern in dangerous_patterns):
-            return "❌ Error: Invalid expression for security reasons."
+            return " Error: Invalid expression for security reasons."
         
         # Evaluate safely
         result = eval(expression)
@@ -132,14 +132,14 @@ def calculator(expression: str) -> str:
             else:
                 result = round(result, 2)
         
-        return f"🧮 Calculation: {expression} = {result:,}"
+        return f" Calculation: {expression} = {result:,}"
         
     except ZeroDivisionError:
-        return "❌ Error: Cannot divide by zero."
+        return " Error: Cannot divide by zero."
     except SyntaxError:
-        return "❌ Error: Invalid mathematical expression."
+        return " Error: Invalid mathematical expression."
     except Exception as e:
-        return f"❌ Calculation error: {str(e)}"
+        return f" Calculation error: {str(e)}"
 
 # List of all available tools
 hr_tools = [calculator, context_awareness_filter]
